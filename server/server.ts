@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-     origin: 'http://localhost:3000',
+     origin: 'https://bbs11pr8-3000.inc1.devtunnels.ms',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));

@@ -34,7 +34,11 @@ router.get('/get' , async (req , res) =>{
     return res.json({reports})
 })
 
-
+router.get('/detail/:id' , async (req , res) => {
+    const {id} = req.params;
+    const report = await Report.findById(id);
+    return res.json({report})
+})
 
 
 export default router;
