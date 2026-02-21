@@ -4,15 +4,12 @@ import { useEffect, useState } from "react"
 import Footer from '../../../(components)/footer/page'
 import Header from '../../../(components)/header/page'
 
+const BACKEND_URL = "https://bbs11pr8-5002.inc1.devtunnels.ms";
+
 export default function Profile() {
   const [profile, setProfile] = useState({
-    username: '',
-    email: '',
-    age: '',
-    designation: '',
-    phonenumber: '',
-    unit: '',
-    secretId: ''
+    username: '', email: '', age: '',
+    designation: '', phonenumber: '', unit: '', secretId: ''
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,18 +18,9 @@ export default function Profile() {
     const fetchDetail = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`https://bbs11pr8-5002.inc1.devtunnels.ms/profile/me`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (!res.ok) {
-          throw new Error('Failed to fetch profile data');
-        }
-        
+        const res = await fetch(`${BACKEND_URL}/profile/me`, { method: 'GET', credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch profile data');
         const data = await res.json();
-        console.log(data);
-        
         setProfile({
           username: data.profile.username || '',
           email: data.profile.email || '',
@@ -43,176 +31,341 @@ export default function Profile() {
           secretId: data.profile.secretId || ''
         });
       } catch (err) {
-        console.error("Error fetching profile:", err);
         setError('Failed to load profile data. Please try again later.');
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchDetail();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-100 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full mx-4">
-          <div className="flex flex-col items-center">
-            <div className="w-24 h-24 bg-gray-200 rounded-full mb-6 animate-pulse"></div>
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-6 animate-pulse"></div>
-            <div className="w-full space-y-4">
-              {[1, 2, 3, 4, 5, 6].map(item => (
-                <div key={item} className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
-          <div className="text-red-500 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Profile</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div>
-        <Header/>
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {/* Profile Header */}
-          <div className="bg-green-700 p-6 text-white">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="w-24 h-24 bg-green-800 rounded-full flex items-center justify-center text-4xl font-bold mb-4 md:mb-0 md:mr-6">
-                {profile.username ? profile.username[0].toUpperCase() : 'A'}
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap');
+
+        :root {
+          --cyan: #00e5ff; --cyan-dim: #00b8cc;
+          --cyan-glow: rgba(0,229,255,0.10); --cyan-border: rgba(0,229,255,0.22);
+          --bg-deep: #020c10; --bg-panel: #040f14; --bg-card: #061318;
+          --text-primary: #e0f7fa; --text-muted: #546e7a;
+          --red-alert: #ff1744; --amber: #ffab00; --green-ok: #00e676;
+        }
+
+        .pf-root {
+          background: var(--bg-deep); min-height: 100vh;
+          font-family: 'Exo 2', sans-serif; color: var(--text-primary);
+          position: relative; overflow-x: hidden;
+        }
+
+        .pf-grid-bg {
+          position: fixed; inset: 0;
+          background-image:
+            linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+          background-size: 40px 40px; pointer-events: none; z-index: 0;
+        }
+
+        .pf-scanlines {
+          position: fixed; inset: 0;
+          background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+          pointer-events: none; z-index: 1;
+        }
+
+        .pf-content { position: relative; z-index: 2; }
+
+        .pf-main { max-width: 1000px; margin: 0 auto; padding: 48px 24px 80px; }
+
+        /* ---- LOADER / ERROR ---- */
+        .pf-state {
+          max-width: 500px; margin: 80px auto;
+          background: var(--bg-card); border: 1px solid var(--cyan-border);
+          padding: 48px 24px; text-align: center;
+        }
+
+        .pf-loader-ring {
+          display: inline-block; width: 40px; height: 40px;
+          border: 2px solid rgba(0,229,255,0.1); border-top-color: var(--cyan);
+          border-radius: 50%; animation: pf-spin 0.8s linear infinite; margin-bottom: 16px;
+        }
+
+        @keyframes pf-spin { to { transform: rotate(360deg); } }
+
+        .pf-state-text {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 11px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase;
+        }
+
+        /* ---- PROFILE HEADER ---- */
+        .pf-header {
+          background: var(--bg-card); border: 1px solid var(--cyan-border);
+          position: relative; overflow: hidden; margin-bottom: 2px;
+        }
+
+        .pf-header::before {
+          content: '';
+          position: absolute; top: 0; left: 0; right: 0; height: 2px;
+          background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+
+        .pf-header-inner {
+          padding: 36px 36px 32px;
+          display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+        }
+
+        .pf-avatar {
+          width: 72px; height: 72px; flex-shrink: 0;
+          border: 1px solid var(--cyan-border); background: var(--cyan-glow);
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: 700;
+          color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5);
+          clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+        }
+
+        .pf-header-info { flex: 1; }
+
+        .pf-eyebrow {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase;
+          color: var(--cyan-dim); margin-bottom: 8px;
+        }
+
+        .pf-username {
+          font-family: 'Rajdhani', sans-serif;
+          font-size: 34px; font-weight: 700; letter-spacing: 0.1em;
+          color: var(--text-primary); line-height: 1; margin-bottom: 6px;
+        }
+
+        .pf-role-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .pf-tag {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+          color: var(--cyan); border: 1px solid var(--cyan-border);
+          background: var(--cyan-glow); padding: 3px 10px;
+        }
+
+        /* ---- STATS ---- */
+        .pf-stats {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 2px; background: var(--cyan-border);
+          border: 1px solid var(--cyan-border); border-top: none;
+          margin-bottom: 24px;
+        }
+
+        @media (max-width: 540px) { .pf-stats { grid-template-columns: 1fr; } }
+
+        .pf-stat {
+          background: var(--bg-panel); padding: 22px 20px; text-align: center;
+          position: relative;
+        }
+
+        .pf-stat::before {
+          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        }
+
+        .pf-stat.s-cyan::before { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+        .pf-stat.s-green::before { background: var(--green-ok); box-shadow: 0 0 8px var(--green-ok); }
+        .pf-stat.s-amber::before { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+        .pf-stat-num {
+          font-family: 'Rajdhani', sans-serif; font-size: 38px; font-weight: 700; line-height: 1; margin-bottom: 4px;
+        }
+
+        .pf-stat.s-cyan .pf-stat-num { color: var(--cyan); text-shadow: 0 0 16px rgba(0,229,255,0.4); }
+        .pf-stat.s-green .pf-stat-num { color: var(--green-ok); text-shadow: 0 0 16px rgba(0,230,118,0.4); }
+        .pf-stat.s-amber .pf-stat-num { color: var(--amber); text-shadow: 0 0 16px rgba(255,171,0,0.4); }
+
+        .pf-stat-label {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted);
+        }
+
+        /* ---- INFO PANELS ---- */
+        .pf-panels {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+          background: var(--cyan-border); border: 1px solid var(--cyan-border);
+          margin-bottom: 24px;
+        }
+
+        @media (max-width: 640px) { .pf-panels { grid-template-columns: 1fr; } }
+
+        .pf-panel { background: var(--bg-card); padding: 28px 28px; }
+
+        .pf-panel-title {
+          font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+          letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-primary);
+          margin-bottom: 20px; padding-bottom: 10px;
+          border-bottom: 1px solid rgba(0,229,255,0.1);
+          display: flex; align-items: center; gap: 8px;
+        }
+
+        .pf-panel-title::before {
+          content: ''; display: block; width: 2px; height: 16px;
+          background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
+        }
+
+        .pf-field { margin-bottom: 14px; }
+        .pf-field:last-child { margin-bottom: 0; }
+
+        .pf-field-label {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase;
+          color: var(--text-muted); margin-bottom: 5px;
+        }
+
+        .pf-field-val {
+          background: var(--bg-panel); border: 1px solid rgba(0,229,255,0.08);
+          border-left: 2px solid var(--cyan-border);
+          padding: 9px 14px;
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 12px; letter-spacing: 0.05em; color: var(--text-primary);
+        }
+
+        .pf-field-val.empty { color: #2e4650; font-style: normal; }
+        .pf-field-val.mono { font-family: 'Share Tech Mono', monospace; color: var(--cyan-dim); }
+
+        /* ---- ACTIONS ---- */
+        .pf-actions {
+          display: flex; gap: 2px; flex-wrap: wrap;
+          background: var(--cyan-border); border: 1px solid var(--cyan-border);
+        }
+
+        .pf-action-btn {
+          flex: 1; min-width: 140px;
+          background: var(--bg-card); border: none;
+          color: var(--text-muted); font-family: 'Share Tech Mono', monospace;
+          font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+          padding: 16px 20px; cursor: pointer;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          transition: all 0.2s;
+        }
+
+        .pf-action-btn:hover { background: #071820; color: var(--cyan); }
+        .pf-action-btn svg { flex-shrink: 0; }
+      `}</style>
+
+      <div className="pf-root">
+        <div className="pf-grid-bg" /><div className="pf-scanlines" />
+
+        <div className="pf-content">
+          <Header />
+
+          <div className="pf-main">
+            {isLoading ? (
+              <div className="pf-state">
+                <div className="pf-loader-ring" />
+                <div className="pf-state-text">Loading personnel file...</div>
               </div>
-              <div className="text-center md:text-left">
-                <h1 className="text-3xl font-bold">{profile.username || 'Unknown User'}</h1>
-                <p className="text-green-100">{profile.designation || 'Army Personnel'}</p>
-                <p className="text-green-100 mt-1">{profile.unit || 'No unit assigned'}</p>
+            ) : error ? (
+              <div className="pf-state">
+                <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={0.75} style={{ color: 'rgba(255,23,68,0.3)', marginBottom: 16 }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="pf-state-text" style={{ color: 'var(--red-alert)' }}>{error}</div>
+                <button onClick={() => window.location.reload()} style={{ marginTop: 20, padding: '8px 20px', background: 'transparent', border: '1px solid rgba(0,229,255,0.3)', color: 'var(--cyan)', fontFamily: 'Share Tech Mono', fontSize: 10, letterSpacing: '0.2em', cursor: 'pointer', textTransform: 'uppercase' }}>
+                  RETRY
+                </button>
               </div>
-            </div>
-          </div>
-          
-          {/* Profile Content */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Personal Information */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200">
-                      {profile.email || 'Not provided'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Age</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200">
-                      {profile.age || 'Not provided'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200">
-                      {profile.phonenumber || 'Not provided'}
-                    </p>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="pf-header">
+                  <div className="pf-header-inner">
+                    <div className="pf-avatar">
+                      {profile.username ? profile.username[0].toUpperCase() : 'A'}
+                    </div>
+                    <div className="pf-header-info">
+                      <div className="pf-eyebrow">◈ PERSONNEL FILE · ACTIVE OPERATOR</div>
+                      <div className="pf-username">{profile.username || 'Unknown Operator'}</div>
+                      <div className="pf-role-tags">
+                        {profile.designation && <div className="pf-tag">{profile.designation}</div>}
+                        {profile.unit && <div className="pf-tag">⬡ {profile.unit}</div>}
+                        <div className="pf-tag">CLEARANCE ACTIVE</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Military Information */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Military Information</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Designation/Rank</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200">
-                      {profile.designation || 'Not provided'}
-                    </p>
+
+                {/* Stats */}
+                <div className="pf-stats">
+                  <div className="pf-stat s-cyan">
+                    <div className="pf-stat-num">24</div>
+                    <div className="pf-stat-label">Reports Submitted</div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Unit</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200">
-                      {profile.unit || 'Not provided'}
-                    </p>
+                  <div className="pf-stat s-green">
+                    <div className="pf-stat-num">18</div>
+                    <div className="pf-stat-label">Approved</div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Secret ID</label>
-                    <p className="text-gray-800 bg-white p-3 rounded-lg border border-gray-200 font-mono">
-                      {profile.secretId || 'Not provided'}
-                    </p>
+                  <div className="pf-stat s-amber">
+                    <div className="pf-stat-num">6</div>
+                    <div className="pf-stat-label">Pending Review</div>
                   </div>
                 </div>
-              </div>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                Edit Profile
-              </button>
-              <button className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                Download Profile
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                Request Support
-              </button>
-            </div>
+
+                {/* Info panels */}
+                <div className="pf-panels">
+                  <div className="pf-panel">
+                    <div className="pf-panel-title">Personal Information</div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Email Address</div>
+                      <div className={`pf-field-val${!profile.email ? ' empty' : ''}`}>{profile.email || 'Not provided'}</div>
+                    </div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Age</div>
+                      <div className={`pf-field-val${!profile.age ? ' empty' : ''}`}>{profile.age || 'Not provided'}</div>
+                    </div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Phone Number</div>
+                      <div className={`pf-field-val${!profile.phonenumber ? ' empty' : ''}`}>{profile.phonenumber || 'Not provided'}</div>
+                    </div>
+                  </div>
+
+                  <div className="pf-panel">
+                    <div className="pf-panel-title">Military Information</div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Designation / Rank</div>
+                      <div className={`pf-field-val${!profile.designation ? ' empty' : ''}`}>{profile.designation || 'Not provided'}</div>
+                    </div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Unit</div>
+                      <div className={`pf-field-val${!profile.unit ? ' empty' : ''}`}>{profile.unit ? `⬡ ${profile.unit}` : 'Not provided'}</div>
+                    </div>
+                    <div className="pf-field">
+                      <div className="pf-field-label">Secret ID</div>
+                      <div className={`pf-field-val mono${!profile.secretId ? ' empty' : ''}`}>{profile.secretId || 'Not provided'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pf-actions">
+                  <button className="pf-action-btn">
+                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Edit Profile
+                  </button>
+                  <button className="pf-action-btn">
+                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download File
+                  </button>
+                  <button className="pf-action-btn">
+                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    Request Support
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-        
-        {/* Additional Information Card */}
-        <div className="bg-white rounded-xl shadow-lg mt-6 p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Service Record</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-3xl font-bold text-green-700">24</div>
-              <div className="text-gray-600">Reports Submitted</div>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-3xl font-bold text-blue-700">18</div>
-              <div className="text-gray-600">Approved Reports</div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <div className="text-3xl font-bold text-yellow-700">6</div>
-              <div className="text-gray-600">Pending Reports</div>
-            </div>
-          </div>
+
+          <Footer />
         </div>
       </div>
-    </div>
-
-      <Footer/>
-    </div>
+    </>
   );
 }
