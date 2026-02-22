@@ -48,7 +48,7 @@ export default function ChatBot() {
     setInput("");
 
     try {
-      const res = await fetch("https://bbs11pr8-5002.inc1.devtunnels.ms/gemini/ask", {
+      const res = await fetch("http://localhost:5002/gemini/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

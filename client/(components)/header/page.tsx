@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const BACKEND_URL = "https://bbs11pr8-5002.inc1.devtunnels.ms";
+const BACKEND_URL = "http://localhost:5002";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

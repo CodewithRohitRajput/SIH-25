@@ -5,7 +5,7 @@ import Header from "@/(components)/header/page";
 import Footer from "@/(components)/footer/page";
 import Link from "next/link";
 
-const BACKEND_URL = "https://bbs11pr8-5002.inc1.devtunnels.ms";
+const BACKEND_URL = "http://localhost:5002";
 
 type Report = {
   _id?: string;

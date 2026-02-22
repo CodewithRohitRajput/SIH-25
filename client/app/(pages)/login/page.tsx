@@ -2,11 +2,11 @@
 import { useState } from "react";
 import Footer from "@/(components)/footer/page";
 
-const BACKEND_URL = "https://bbs11pr8-5002.inc1.devtunnels.ms";
+const BACKEND_URL = "http://localhost:5002";
 
 export default function Login() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(''); 
   const [phonenumber, setPhonenumber] = useState('');
   const [secretId, setSecretId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

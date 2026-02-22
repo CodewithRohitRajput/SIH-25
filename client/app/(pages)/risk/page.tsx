@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Header from '@/(components)/header/page'
 import Footer from "@/(components)/footer/page"
 
-const BACKEND_URL = "https://bbs11pr8-5002.inc1.devtunnels.ms"
+const BACKEND_URL = "http://localhost:5002"
 
 export default function Risked() {
   const [riskApps, setRiskApps] = useState([]);

@@ -17,7 +17,7 @@ export default function Admin() {
     setLoading(true);
     setMessage('');
     try {
-      const res = await fetch(`https://bbs11pr8-5002.inc1.devtunnels.ms/risk/do`, {
+      const res = await fetch(`http://localhost:5002/risk/do`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
